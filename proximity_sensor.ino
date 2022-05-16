@@ -8,37 +8,31 @@
 using pin_t = uint8_t;
 using LCD = LiquidCrystal_I2C;
 
-namespace       // pins initialization
-{
-    // input button pin
-    const pin_t buttonFlagPin_g { 2 };      // on digital pin 2
 
-    // ultrasonic pins
-    const pin_t trigPin_g { 3 };            // on digital pin 3
-    const pin_t echoPin_g { 4 };            // on digital pin 4
+// pins initialization
+//-------------------------------------------------------------------------------------------------------------
 
-    // for lcd_i2c, SDA goes to A4, and SCL goes to A5 (on arduino UNO (can't be changed unless the board differs))
-}
+// input button pin
+constexpr pin_t g_buttonFlagPin { 2 };      // on digital pin 2
 
-namespace       // configuration variables
-{
-    // lcd
-    const uint8_t lcdAddress_g { 0x27 };              // see online on how to search for lcd address
-    
-    // speed of sound
-    const double defaultSpeedOfSound_g { 340 };       // default speed of sound value (in m/s)
-    const double calibrateDistance_g { 0.1 };         // in meters (change freely)
-}
+// ultrasonic pins
+constexpr pin_t g_trigPin { 3 };            // on digital pin 3
+constexpr pin_t g_echoPin { 4 };            // on digital pin 4
 
-namespace       // init variables, used on loop()
-{
-    // instantiate lcd object
-    LCD lcd { lcdAddress_g, 16, 2 };
+// for lcd_i2c, SDA goes to A4, and SCL goes to A5 (on arduino UNO (can't be changed unless the board differs))
+//-------------------------------------------------------------------------------------------------------------
 
-    // intialize measured distance and speed of sound
-    double measuredDistance {};
-    double speedOfSound { defaultSpeedOfSound_g };
-}
+
+// configuration variables
+//--------------------------------------------------------------------------------------------------
+
+// lcd
+constexpr uint8_t g_lcdAddress { 0x27 };              // see online on how to search for lcd address
+
+// speed of sound
+constexpr double g_defaultSpeedOfSound { 340 };       // default speed of sound value (in m/s)
+constexpr double g_calibrateDistance { 0.1 };         // in meters (change freely)
+//---------------------------------------------------------------------------------------------------
 
 
 //=======================================================================================
@@ -51,13 +45,28 @@ double measureDistance(const pin_t, const pin_t, const double);
 double measureSoundSpeed(const pin_t, const pin_t, const double);
 
 
+//=======================================================================================
+// main program
+
+// init variables that used in loop()
+//------------------------------------------------
+
+// instantiate lcd object
+LCD lcd { g_lcdAddress, 16, 2 };
+
+// intialize measured distance and speed of sound
+double measuredDistance {};
+double speedOfSound { g_defaultSpeedOfSound };
+//------------------------------------------------
+
+
 // main setup
 void setup()
 {
     // set pins mode
-    pinMode(buttonFlagPin_g, INPUT);
-    pinMode(trigPin_g, OUTPUT);
-    pinMode(echoPin_g, INPUT);
+    pinMode(g_buttonFlagPin, INPUT);
+    pinMode(g_trigPin, OUTPUT);
+    pinMode(g_echoPin, INPUT);
 
     // start serial
     Serial.begin(9600);
@@ -98,7 +107,7 @@ void loop()
     lcd.print("cm");
 
     // measure distance
-    measuredDistance = 100 * measureDistance(trigPin_g, echoPin_g, speedOfSound);        // in cm
+    measuredDistance = 100 * measureDistance(g_trigPin, g_echoPin, speedOfSound);        // in cm
     lcd.setCursor(0, 1);
     lcd.print("             ");
     lcd.setCursor(0, 1);
@@ -110,17 +119,17 @@ void loop()
 
     // delay 1 second, if it returns true, go to calibrate
     if (waitForInput(1))
-        speedOfSound = calibrate(trigPin_g, echoPin_g, calibrateDistance_g, lcd);
+        speedOfSound = calibrate(g_trigPin, g_echoPin, g_calibrateDistance, lcd);
 }
 
 
 //=======================================================================================
-// function definitions
+// forward declared function definitions
 
 // return true if button pressed, false if otherwise
 bool getFlag()
 {
-    return digitalRead(buttonFlagPin_g);
+    return digitalRead(g_buttonFlagPin);
 }
 
 // wait for input from button: return true if pressed, otherwise return false if not pressed and [duration] in seconds has elapsed
@@ -155,7 +164,7 @@ double calibrate(const pin_t trigPin, const pin_t echoPin, const double calibrat
         lcd.print("UseDefaultSpeed");
         delay(3000);
         lcd.clear();
-        return defaultSpeedOfSound_g;
+        return g_defaultSpeedOfSound;
     }
 
     lcd.clear();
@@ -210,7 +219,7 @@ double calibrate(const pin_t trigPin, const pin_t echoPin, const double calibrat
         lcd.print("UseDefaultSpeed");
         delay(3000);
         lcd.clear();
-        return defaultSpeedOfSound_g;
+        return g_defaultSpeedOfSound;
     }
 
     lcd.clear();
