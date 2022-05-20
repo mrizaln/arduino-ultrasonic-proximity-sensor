@@ -154,9 +154,9 @@ double calibrate(const pin_t trigPin, const pin_t echoPin, const double calibrat
     lcd.print("PressToContinue");
     delay(500);
     
-    // cancelled
     if (!waitForInput(10))
     {
+        // cancelled
         lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print("Canceled      :(");
@@ -209,9 +209,9 @@ double calibrate(const pin_t trigPin, const pin_t echoPin, const double calibrat
     lcd.print("PressToContinue");
     delay(500);
 
-    // canceled
     if (!waitForInput(20))
     {
+        // canceled
         lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print("Canceled      :(");
