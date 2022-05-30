@@ -111,14 +111,14 @@ void loop()
     lcd.setCursor(0, 1);
     lcd.print("             ");
     lcd.setCursor(0, 1);
-    lcd.print(measuredDistance, 3);
+    lcd.print(measuredDistance, 2);
     
     // serial
-    Serial.print(measuredDistance, 3);
+    Serial.print(measuredDistance, 2);
     Serial.println("\tcm");
 
     // delay 1 second, if it returns true, go to calibrate
-    if (waitForInput(1))
+    if (waitForInput(1000))
         speedOfSound = calibrate(g_trigPin, g_echoPin, g_calibrateDistance, lcd);
 }
 
@@ -132,12 +132,15 @@ bool getFlag()
     return digitalRead(g_buttonFlagPin);
 }
 
-// wait for input from button: return true if pressed, otherwise return false if not pressed and [duration] in seconds has elapsed
-bool waitForInput(const int duration)
+// wait for input from button: return true if pressed, otherwise return false if not pressed and [duration] in miliseconds has elapsed
+bool waitForInput(const int durationInMs)
 {
-    for(int count { duration*10 }; count != 0; --count)
+    const int delayInMs { 10 };
+    int duration { durationInMs / delayInMs };
+
+    for(int count { duration }; count != 0; --count)
     {
-        delay(100);
+        delay(delayInMs);
         if (getFlag()) return true;
     }
 
@@ -154,7 +157,8 @@ double calibrate(const pin_t trigPin, const pin_t echoPin, const double calibrat
     lcd.print("PressToContinue");
     delay(500);
     
-    if (!waitForInput(10))
+    // wait for input for 10 seconds
+    if (!waitForInput(10000))
     {
         // cancelled
         lcd.clear();
@@ -207,9 +211,9 @@ double calibrate(const pin_t trigPin, const pin_t echoPin, const double calibrat
     lcd.print("m/s");
     lcd.setCursor(0, 1);
     lcd.print("PressToContinue");
-    delay(500);
 
-    if (!waitForInput(20))
+    // wait for input for 10 seconds
+    if (!waitForInput(10000))
     {
         // canceled
         lcd.clear();
@@ -223,7 +227,7 @@ double calibrate(const pin_t trigPin, const pin_t echoPin, const double calibrat
     }
 
     lcd.clear();
-
+    delay(1000);
     return soundSpeed;
 }
 
